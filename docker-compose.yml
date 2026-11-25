@@ -1,0 +1,50 @@
+# Mission 3 - Services du projet
+# Lancement : docker compose up -d
+# Les mots de passe sont lus dans le fichier .env (voir .env.exemple).
+
+services:
+
+  mariadb:
+    image: mariadb:11
+    container_name: sae503-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      # Exécutés une seule fois, au premier démarrage, dans l'ordre des numéros
+      - ./bdd/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./bdd/donnees_test.sql:/docker-entrypoint-initdb.d/02_donnees_test.sql:ro
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: sae503-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./infra/mosquitto:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: sae503-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb-data:
+  mosquitto-data:
+  grafana-data:

@@ -1,0 +1,5 @@
+requests
+paho-mqtt>=2.0
+mysql-connector-python
+python-dotenv
+meross-iot
