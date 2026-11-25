@@ -8,7 +8,7 @@ les mesures en base et allume ou coupe les prises connectées pour consommer le 
 
 | Mission | Dossiers | Branche |
 |---|---|---|
-| 1 - Données et logique de décision | `bdd/`, `gestion/` | `mission1Sami` |
+| 1 - Données et logique de décision | `bdd/`, `gestion/` | `mission1Semi` |
 | 2 - Objets connectés | `prises/` | `mission2Aminata` |
 | 3 - Infrastructure, supervision et sécurité | `docker-compose.yml`, `infra/` | `mission3Veronica` |
 
