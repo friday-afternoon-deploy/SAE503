@@ -1,15 +1,15 @@
-"""Mission 1 - Règles de mise en marche et d'arrêt des prises.
+#"""Mission 1 - Règles de mise en marche et d'arrêt des prises.
 
-Principe : le surplus de production est un « budget » de puissance.
-On parcourt les appareils par ordre de priorité (1 = le plus prioritaire) et on
-allume chaque appareil dont la puissance tient encore dans le budget restant.
-Les autres sont éteints.
+#Principe : le surplus de production est un « budget » de puissance.
+#On parcourt les appareils par ordre de priorité (1 = le plus prioritaire) et on
+#allume chaque appareil dont la puissance tient encore dans le budget restant.
+#Les autres sont éteints.
 
-Hypothèse à valider : la consommation renvoyée par l'onduleur virtuel ne tient pas
-compte des appareils pilotés (l'onduleur est simulé). Le budget est donc le surplus
-de l'onduleur, sans y ajouter la puissance des appareils déjà allumés.
-Si on passe un jour sur un vrai onduleur, il faudra ajouter cette puissance au surplus.
-"""
+#Hypothèse à valider : la consommation renvoyée par l'onduleur virtuel ne tient pas
+#compte des appareils pilotés (l'onduleur est simulé). Le budget est donc le surplus
+#de l'onduleur, sans y ajouter la puissance des appareils déjà allumés.
+#Si on passe un jour sur un vrai onduleur, il faudra ajouter cette puissance au surplus.
+#"""
 
 MARGE_W = 100  # marge de sécurité pour éviter d'acheter au réseau
 

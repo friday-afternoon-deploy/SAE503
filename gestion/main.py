@@ -1,14 +1,14 @@
-"""Mission 1 - Boucle principale du script de gestion.
+# """Mission 1 - Boucle principale du script de gestion.
 
-À chaque cycle :
-  1. lecture de l'onduleur virtuel ;
-  2. enregistrement de la production, de la consommation et du surplus en base ;
-  3. décision : quelles prises allumer ou éteindre ;
-  4. envoi des ordres aux prises et enregistrement de leur état et de leur consommation.
+#À chaque cycle :
+#  1. lecture de l'onduleur virtuel ;
+#  2. enregistrement de la production, de la consommation et du surplus en base ;
+#  3. décision : quelles prises allumer ou éteindre ;
+#  4. envoi des ordres aux prises et enregistrement de leur état et de leur consommation.
 
-Fonctionnement normal : un cycle toutes les 15 minutes, avec l'heure réelle.
-Mode démo (MODE_DEMO=1) : rejoue les 24 heures de la journée, une heure toutes les 10 s.
-"""
+#Fonctionnement normal : un cycle toutes les 15 minutes, avec l'heure réelle.
+#Mode démo (MODE_DEMO=1) : rejoue les 24 heures de la journée, une heure toutes les 10 s.
+#"""
 
 import logging
 import os

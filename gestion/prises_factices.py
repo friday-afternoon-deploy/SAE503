@@ -1,7 +1,7 @@
-"""Mission 1 - Prises simulées, avec exactement la même interface que prises/prises.py.
+#"""Mission 1 - Prises simulées, avec exactement la même interface que prises/prises.py.
 
-Permet de tester la logique sans matériel : PRISES_FACTICES=1 dans le fichier .env.
-"""
+#Permet de tester la logique sans matériel : PRISES_FACTICES=1 dans le fichier .env.
+#"""
 
 PUISSANCES_W = {"esp1": 1700, "shelly1": 1500, "shelly2": 1200, "meross1": 2300, "emylo1": 800}
 _etats: dict[str, bool] = {}
