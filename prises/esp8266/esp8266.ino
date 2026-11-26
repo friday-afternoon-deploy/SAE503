@@ -1,103 +1,115 @@
-// Mission 2 - ESP8266 : prise simulée pilotée en MQTT
-// Bibliothèque nécessaire (Arduino IDE) : PubSubClient (Nick O'Leary)
-// Carte : « NodeMCU 1.0 (ESP-12E Module) » ou équivalent
-//
-// Topics (identifiant esp1, maison maison1) :
-//   maison1/esp1/set    <- ON / OFF        (ordre reçu)
-//   maison1/esp1/etat   -> ON / OFF        (retenu)
-//   maison1/esp1/conso  -> puissance en W  (retenu)
-//   maison1/esp1/dispo  -> online / offline (retenu, message de dernière volonté)
+/*
+  SAE 503 - Mission 2 : ESP8266 = prise connectée simulée (MQTT)
 
+  Topics (contrat du groupe), avec MAISON="maison1" et OBJET="esp1" :
+    maison1/esp1/set    <- ON / OFF          (reçu, QoS 1)
+    maison1/esp1/etat   -> ON / OFF          (publié, retenu)
+    maison1/esp1/conso  -> puissance en W    (publié toutes les 30 s et à chaque changement)
+    maison1/esp1/dispo  -> online / offline  (retenu ; "offline" = dernière volonté du broker)
+
+  La LED de la carte représente la prise (sur NodeMCU/Wemos, la LED est allumée quand la broche est à LOW).
+  Bibliothèque : PubSubClient (Nick O'Leary).
+*/
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-// ---- À compléter (ne pas envoyer les vrais mots de passe sur GitHub) ----
-const char* WIFI_SSID     = "a_remplacer";
-const char* WIFI_PASSWORD = "a_remplacer";
-const char* MQTT_HOST     = "192.168.50.10";   // adresse du Raspberry Pi
-const int   MQTT_PORT     = 1883;
-const char* MQTT_USER     = "esp1";
-const char* MQTT_PASSWORD = "a_remplacer";
-// --------------------------------------------------------------------------
+// ---------------------------------------------------------------- à adapter
+const char* WIFI_SSID = "SAE-GR3IOM";
+const char* WIFI_PASS = "A_REMPLACER";      // NE JAMAIS envoyer le vrai mot de passe sur GitHub
+const char* MQTT_HOST = "192.168.50.136";   // IP du broker (le Pi). Sert à tes tests ; l'IP finale sera confirmée à l'intégration
+const uint16_t MQTT_PORT = 1883;
+const char* MQTT_USER = "gestion";                 // vide pour le broker de test ; sera rempli avec le compte de la Mission 3
+const char* MQTT_PASS = "mqtt";
 
-const char* TOPIC_SET   = "maison1/esp1/set";
-const char* TOPIC_ETAT  = "maison1/esp1/etat";
-const char* TOPIC_CONSO = "maison1/esp1/conso";
-const char* TOPIC_DISPO = "maison1/esp1/dispo";
-
-const int   BROCHE_SORTIE = LED_BUILTIN;   // remplacer par la broche du relais
-const bool  SORTIE_INVERSEE = true;        // la LED intégrée s'allume à l'état bas
-const int   PUISSANCE_SIMULEE_W = 1700;    // chauffe-eau simulé
+const char* MAISON = "maison1";
+const char* OBJET  = "esp1";
+const int PUISSANCE_W = 1700;               // puissance de l'appareil simulé (chauffe-eau) quand la prise est ON
 const unsigned long PERIODE_CONSO_MS = 30000;
+// ----------------------------------------------------------------
 
-WiFiClient wifi;
-PubSubClient mqtt(wifi);
+char tSet[48], tEtat[48], tConso[48], tDispo[48];
+WiFiClient wifiClient;
+PubSubClient mqtt(wifiClient);
 bool allume = false;
-unsigned long dernierEnvoi = 0;
+unsigned long dernierConso = 0;
 
-void appliquerSortie() {
-  digitalWrite(BROCHE_SORTIE, (allume != SORTIE_INVERSEE) ? HIGH : LOW);
+void appliquer(bool on) {
+  allume = on;
+  digitalWrite(LED_BUILTIN, on ? LOW : HIGH);   // LED allumée = prise ON
 }
 
 void publierEtat() {
-  mqtt.publish(TOPIC_ETAT, allume ? "ON" : "OFF", true);
-  String conso = String(allume ? PUISSANCE_SIMULEE_W : 0);
-  mqtt.publish(TOPIC_CONSO, conso.c_str(), true);
-  dernierEnvoi = millis();
+  mqtt.publish(tEtat, allume ? "ON" : "OFF", true);   // true = message retenu
 }
 
-void recevoir(char* topic, byte* payload, unsigned int longueur) {
-  String message;
-  for (unsigned int i = 0; i < longueur; i++) message += (char)payload[i];
-  message.trim();
-  if (message == "ON")  allume = true;
-  else if (message == "OFF") allume = false;
-  else return;
-  appliquerSortie();
+void publierConso() {
+  char buf[12];
+  snprintf(buf, sizeof(buf), "%d", allume ? PUISSANCE_W : 0);
+  mqtt.publish(tConso, buf);
+  dernierConso = millis();
+}
+
+void onMessage(char* topic, byte* payload, unsigned int len) {
+  String msg;
+  for (unsigned int i = 0; i < len; i++) msg += (char)payload[i];
+  msg.trim();
+  msg.toUpperCase();
+  Serial.printf("Message reçu sur %s : %s\n", topic, msg.c_str());
+  if (msg == "ON") appliquer(true);
+  else if (msg == "OFF") appliquer(false);
+  else return;                                  // message inconnu : on ignore
   publierEtat();
-  Serial.println("Ordre reçu : " + message);
+  publierConso();
 }
 
 void connecterWifi() {
+  Serial.printf("Connexion au Wi-Fi %s ", WIFI_SSID);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connexion Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println(" OK, IP : " + WiFi.localIP().toString());
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+  Serial.printf("\nWi-Fi OK, IP = %s\n", WiFi.localIP().toString().c_str());
 }
 
 void connecterMqtt() {
   while (!mqtt.connected()) {
-    Serial.print("Connexion MQTT...");
-    // Message de dernière volonté : "offline" publié par le broker si l'ESP disparaît
-    if (mqtt.connect("esp1", MQTT_USER, MQTT_PASSWORD, TOPIC_DISPO, 1, true, "offline")) {
-      Serial.println(" OK");
-      mqtt.publish(TOPIC_DISPO, "online", true);
-      mqtt.subscribe(TOPIC_SET, 1);
+    String id = String("esp-") + OBJET + "-" + String(ESP.getChipId(), HEX);
+    Serial.printf("Connexion MQTT à %s ... ", MQTT_HOST);
+    bool ok;
+    if (strlen(MQTT_USER) > 0)
+      ok = mqtt.connect(id.c_str(), MQTT_USER, MQTT_PASS, tDispo, 1, true, "offline");  // dernière volonté
+    else
+      ok = mqtt.connect(id.c_str(), NULL, NULL, tDispo, 1, true, "offline");
+    if (ok) {
+      Serial.println("OK");
+      mqtt.subscribe(tSet, 1);                  // QoS 1 pour les ordres
+      mqtt.publish(tDispo, "online", true);
       publierEtat();
+      publierConso();
     } else {
-      Serial.print(" échec, code ");
-      Serial.println(mqtt.state());
-      delay(5000);
+      Serial.printf("échec (code %d), nouvel essai dans 3 s\n", mqtt.state());
+      delay(3000);
     }
   }
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BROCHE_SORTIE, OUTPUT);
-  appliquerSortie();
+  pinMode(LED_BUILTIN, OUTPUT);
+  appliquer(false);                             // au démarrage : prise éteinte
+
+  snprintf(tSet,   sizeof(tSet),   "%s/%s/set",   MAISON, OBJET);
+  snprintf(tEtat,  sizeof(tEtat),  "%s/%s/etat",  MAISON, OBJET);
+  snprintf(tConso, sizeof(tConso), "%s/%s/conso", MAISON, OBJET);
+  snprintf(tDispo, sizeof(tDispo), "%s/%s/dispo", MAISON, OBJET);
+
   connecterWifi();
   mqtt.setServer(MQTT_HOST, MQTT_PORT);
-  mqtt.setCallback(recevoir);
+  mqtt.setCallback(onMessage);
 }
 
 void loop() {
   if (WiFi.status() != WL_CONNECTED) connecterWifi();
   if (!mqtt.connected()) connecterMqtt();
   mqtt.loop();
-  if (millis() - dernierEnvoi > PERIODE_CONSO_MS) publierEtat();
+  if (millis() - dernierConso >= PERIODE_CONSO_MS) publierConso();
 }
