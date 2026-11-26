@@ -20,7 +20,7 @@ SAE503/
 ├── .gitignore
 ├── .env.exemple            modèle du fichier .env (à copier en .env)
 ├── requirements.txt        bibliothèques Python
-├── docker-compose.yml      MariaDB, Mosquitto, Grafana, Node-RED
+├── docker-compose.yml      MariaDB, Mosquitto, Grafana, Node-RED, phpMyAdmin
 ├── bdd/
 │   ├── schema.sql          création des tables
 │   └── donnees_test.sql    maison et objets de test
