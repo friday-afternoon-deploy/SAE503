@@ -46,6 +46,8 @@ SAE503/
 | Mosquitto | 1883 | Broker MQTT |
 | Grafana | 3000 | Supervision |
 | Node-RED | 1880 | Passerelle MQTT vers les prises cloud (Meross, eMylo) |
+| phpMyAdmin | 8080 | Interface web d'administration de la base MariaDB |
+
 
 ## Installation
 
