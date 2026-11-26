@@ -1,14 +1,14 @@
-#"""Mission 2 - Pilotage des prises connectées.
+"""Mission 2 - Pilotage des prises connectées.
 
-#Interface commune (ne pas modifier sans prévenir la mission 1) :
-#    allumer(identifiant)    -> bool
-#    eteindre(identifiant)   -> bool
-#    lire_etat(identifiant)  -> bool | None
-#    lire_conso(identifiant) -> float | None   (en watts)
+Interface commune (ne pas modifier sans prévenir la mission 1) :
+    allumer(identifiant)    -> bool
+    eteindre(identifiant)   -> bool
+    lire_etat(identifiant)  -> bool | None
+    lire_conso(identifiant) -> float | None   (en watts)
 
-#Règles : aucune exception ne sort de ces fonctions ; en cas d'erreur, on écrit dans
-#le journal et on renvoie False ou None. Délai maximal de 5 s par appel.
-#"""
+Règles : aucune exception ne sort de ces fonctions ; en cas d'erreur, on écrit dans
+le journal et on renvoie False ou None. Délai maximal de 5 s par appel.
+"""
 
 import logging
 import os
