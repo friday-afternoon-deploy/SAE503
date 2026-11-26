@@ -1,4 +1,4 @@
-# SAE 503 - Groupe 4 (parcours IOM)
+# SAE 503 - Groupe 3 (parcours IOM)
 
 Système de pilotage de la consommation électrique en fonction de la production solaire.
 Toutes les 15 minutes, le script de gestion lit la production de l'onduleur, enregistre
@@ -10,7 +10,7 @@ les mesures en base et allume ou coupe les prises connectées pour consommer le 
 |---|---|---|
 | 1 - Données et logique de décision | `bdd/`, `gestion/` | `mission1Semi` |
 | 2 - Objets connectés | `prises/` | `mission2Aminata` |
-| 3 - Infrastructure, supervision et sécurité | `docker-compose.yml`, `infra/` | `mission3Veronica` |
+| 3 - Infrastructure, Node-RED, supervision et sécurité | `docker-compose.yml`, `infra/` | `mission3Veronica` |
 
 ## Arborescence
 
@@ -20,7 +20,7 @@ SAE503/
 ├── .gitignore
 ├── .env.exemple            modèle du fichier .env (à copier en .env)
 ├── requirements.txt        bibliothèques Python
-├── docker-compose.yml      MariaDB, Mosquitto, Grafana
+├── docker-compose.yml      MariaDB, Mosquitto, Grafana, Node-RED
 ├── bdd/
 │   ├── schema.sql          création des tables
 │   └── donnees_test.sql    maison et objets de test
@@ -37,6 +37,15 @@ SAE503/
 │   └── grafana/
 └── docs/                   études, schémas, exemples JSON
 ```
+
+## Services (Raspberry Pi, adresse 192.168.50.10)
+
+| Service | Port | Rôle |
+|---|---|---|
+| MariaDB | 3306 | Base de données (maison, objet, mesure) |
+| Mosquitto | 1883 | Broker MQTT |
+| Grafana | 3000 | Supervision |
+| Node-RED | 1880 | Passerelle MQTT vers les prises cloud (Meross, eMylo) |
 
 ## Installation
 

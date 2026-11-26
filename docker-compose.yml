@@ -1,4 +1,4 @@
-# Mission 3 - Services du projet
+# Mission 3 - Services du projet : MariaDB, Mosquitto, Grafana, Node-RED
 # Lancement : docker compose up -d
 # Les mots de passe sont lus dans le fichier .env (voir .env.exemple).
 
@@ -44,7 +44,21 @@ services:
     depends_on:
       - mariadb
 
+  nodered:
+    image: nodered/node-red
+    container_name: sae503-nodered
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered-data:/data
+    depends_on:
+      - mosquitto
+
 volumes:
   mariadb-data:
   mosquitto-data:
   grafana-data:
+  nodered-data:
