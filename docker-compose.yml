@@ -57,6 +57,17 @@ services:
     depends_on:
       - mosquitto
 
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: sae503-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+
 volumes:
   mariadb-data:
   mosquitto-data:
