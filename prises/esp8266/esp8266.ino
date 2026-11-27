@@ -19,7 +19,7 @@ const char* WIFI_PASS = "A_REMPLACER";      // NE JAMAIS envoyer le vrai mot de 
 const char* MQTT_HOST = "192.168.50.136";   // IP du broker (le Pi). Sert à tes tests ; l'IP finale sera confirmée à l'intégration
 const uint16_t MQTT_PORT = 1883;
 const char* MQTT_USER = "gestion";                 // vide pour le broker de test ; sera rempli avec le compte de la Mission 3
-const char* MQTT_PASS = "mqtt";
+const char* MQTT_PASS = "A_REMPLACER";
 
 const char* MAISON = "maison1";
 const char* OBJET  = "esp1";
