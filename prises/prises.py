@@ -17,7 +17,7 @@ import requests
 from paho.mqtt import publish, subscribe
 
 DELAI_S = 5
-DELAI_MEROSS_S = 10  # le cloud Meross est plus lent : connexion + découverte avant la commande
+DELAI_MEROSS_S = 30  # le cloud Meross est plus lent : connexion + découverte avant la commande
 MAISON = os.getenv("MAISON", "maison1")
 MQTT = {
     "hostname": os.getenv("MQTT_HOST", "localhost"),
