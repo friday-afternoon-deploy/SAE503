@@ -18,3 +18,8 @@ donnees_locales/
 
 # Comptes du broker MQTT
 infra/mosquitto/passwd
+
+# Clés privées MQTTS
+infra/mosquitto/certs/*.key
+infra/mosquitto/certs/*.srl
+infra/mosquitto/certs/*.csr
